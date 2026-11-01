@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+
+{% block title %}Batch #{{ batch.id }}{% endblock %}
+
+{% block header_title %}
+<h1 class="page-title">{{ batch.name }}</h1>
+<p class="subtitle">Overnight · {{ batch.niches|length }} niches</p>
+{% endblock %}
+
+{% block actions %}
+{% if is_running or batch.status == 'running' or batch.status == 'queued' %}
+<form method="post" action="/batches/{{ batch.id }}/stop">
+  <button class="btn danger" type="submit">Stop this run</button>
+</form>
+<form method="post" action="/batches/stop-all">
+  <button class="btn danger" type="submit">Stop all</button>
+</form>
+{% endif %}
+{% if batch.total_leads > 0 %}
+<a class="btn primary" href="/batches/{{ batch.id }}/export">Download Excel</a>
+{% endif %}
+<a class="btn" href="/leads">All leads</a>
+{% endblock %}
+
+{% block content %}
+<section class="stats">
+  <div class="stat highlight">
+    <span class="label">New leads</span>
+    <span class="value" id="batch-leads">{{ batch.total_leads }}</span>
+  </div>
+  <div class="stat">
+    <span class="label">Progress</span>
+    <span class="value" id="batch-jobs">{{ batch.completed_jobs }} / {{ batch.total_jobs }}</span>
+  </div>
+  <div class="stat">
+    <span class="label">Status</span>
+    <span class="value sm"><span class="badge {{ batch.status }}" id="batch-status">{{ batch.status }}</span></span>
+  </div>
+</section>
+
+{% if batch.error_message %}
+<section class="card error"><strong>Error:</strong> {{ batch.error_message }}</section>
+{% endif %}
+
+{% if is_running or batch.status == 'running' %}
+<section class="card live info">
+  Working on: <strong id="current-job">{{ batch.current_job_label or 'starting…' }}</strong>
+</section>
+{% endif %}
+
+<section class="card live" style="padding-bottom:0.5rem">
+  <h2>Live activity</h2>
+  <div class="log-toolbar">
+    <span class="muted" id="log-status">Connecting…</span>
+    <label class="inline" style="margin:0">
+      <input type="checkbox" id="auto-scroll" checked />
+      Auto-scroll
+    </label>
+  </div>
+  <div class="log-feed" id="log-feed" aria-live="polite">
+    <div class="log-empty muted">Waiting for activity…</div>
+  </div>
+</section>
+
+<section class="card">
+  <h2>Jobs</h2>
+  {% if campaigns %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Niche</th>
+          <th>Location</th>
+          <th>Status</th>
+          <th>Leads</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in campaigns %}
+        <tr>
+          <td>{{ c.niche }}</td>
+          <td>{{ c.city }}, {{ c.governorate }}</td>
+          <td><span class="badge {{ c.status }}">{{ c.status }}</span></td>
+          <td class="mono">{{ c.progress_with_phone }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty"><strong>Starting…</strong>Browser is launching (first run can take up to 1 minute). Watch the Activity log below for live updates.</div>
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const feed = document.getElementById('log-feed');
+  const statusEl = document.getElementById('log-status');
+  const autoScroll = document.getElementById('auto-scroll');
+  let lastId = 0;
+
+  function fmtTime(ts) {
+    const d = new Date(ts * 1000);
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+  function escapeHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  function addEvents(events) {
+    if (!events.length) return;
+    const empty = feed.querySelector('.log-empty');
+    if (empty) empty.remove();
+    for (const e of events) {
+      lastId = Math.max(lastId, e.id);
+      const row = document.createElement('div');
+      row.className = 'log-row level-' + (e.level || 'info');
+      row.innerHTML = `<span class="log-time">${fmtTime(e.ts)}</span><span class="log-msg">${escapeHtml(e.message)}</span>`;
+      feed.appendChild(row);
+    }
+    while (feed.children.length > 200) feed.removeChild(feed.firstChild);
+    if (autoScroll.checked) feed.scrollTop = feed.scrollHeight;
+  }
+  async function pollLogs() {
+    try {
+      const data = await window.appDebug.fetchJson(
+        '/api/activity?after_id=' + lastId + '&limit=80',
+        {},
+        'batch_detail.pollLogs'
+      );
+      addEvents(data.events || []);
+      statusEl.textContent = 'Live';
+    } catch (e) {
+      window.appDebug.logError('batch_detail.pollLogs.catch', e, { lastId });
+      statusEl.textContent = 'Reconnect…';
+    }
+    setTimeout(pollLogs, 2000);
+  }
+  pollLogs();
+
+  {% if is_running or batch.status == 'running' %}
+  async function pollBatch() {
+    try {
+      const data = await window.appDebug.fetchJson(
+        '/api/batches/{{ batch.id }}/status',
+        {},
+        'batch_detail.pollBatch'
+      );
+      document.getElementById('batch-jobs').textContent = `${data.completed_jobs} / ${data.total_jobs}`;
+      document.getElementById('batch-leads').textContent = data.total_leads;
+      const jobEl = document.getElementById('current-job');
+      if (jobEl && data.current_job_label) jobEl.textContent = data.current_job_label;
+      const statusBadge = document.getElementById('batch-status');
+      if (statusBadge) {
+        statusBadge.textContent = data.status;
+        statusBadge.className = 'badge ' + data.status;
+      }
+      if (!data.is_running && data.status !== 'running') { location.reload(); return; }
+    } catch (e) {
+      window.appDebug.logError('batch_detail.pollBatch.catch', e, { batchId: {{ batch.id }} });
+    }
+    setTimeout(pollBatch, 5000);
+  }
+  setTimeout(pollBatch, 3000);
+  {% endif %}
+</script>
+{% endblock %}

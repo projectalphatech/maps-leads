@@ -1,0 +1,611 @@
+governorates:
+  - id: cairo
+    name_en: Cairo
+    name_ar: القاهرة
+    cities:
+      - Maadi
+      - Nasr City
+      - Heliopolis
+      - Downtown
+      - Zamalek
+      - New Cairo
+      - Fifth Settlement
+      - Shubra
+      - Mokattam
+      - Ain Shams
+      - El Marg
+      - Helwan
+      - El Rehab
+      - Madinaty
+      - Sheraton
+      - Abbassia
+      - Sayeda Zeinab
+      - El Matareya
+
+  - id: giza
+    name_en: Giza
+    name_ar: الجيزة
+    cities:
+      - Dokki
+      - Mohandessin
+      - Agouza
+      - 6th of October
+      - Sheikh Zayed
+      - Haram
+      - Faisal
+      - Imbaba
+      - Bulaq El Dakrour
+      - Warraq
+      - Badrashin
+      - Kerdasa
+      - Hawamdeya
+
+  - id: alexandria
+    name_en: Alexandria
+    name_ar: الإسكندرية
+    cities:
+      - Smouha
+      - Stanley
+      - Sidi Gaber
+      - Miami
+      - Agami
+      - Borg El Arab
+      - Raml Station
+      - Sidi Bishr
+      - Montaza
+      - Gleem
+      - Mandara
+      - Asafra
+      - Moharram Bek
+      - Bacos
+
+  - id: qalyubia
+    name_en: Qalyubia
+    name_ar: القليوبية
+    cities:
+      - Banha
+      - Shubra El Kheima
+      - Qalyub
+      - Khanka
+      - Qaha
+      - Toukh
+      - Kafr Shukr
+      - Obour
+
+  - id: sharqia
+    name_en: Sharqia
+    name_ar: الشرقية
+    cities:
+      - Zagazig
+      - 10th of Ramadan
+      - Belbeis
+      - Minya El Qamh
+      - Abu Hammad
+      - Faqous
+      - Hehia
+      - Kafr Saqr
+
+  - id: dakahlia
+    name_en: Dakahlia
+    name_ar: الدقهلية
+    cities:
+      - Mansoura
+      - Mit Ghamr
+      - Talkha
+      - Aga
+      - Belqas
+      - Sherbin
+      - Dekernes
+      - Manzala
+
+  - id: beheira
+    name_en: Beheira
+    name_ar: البحيرة
+    cities:
+      - Damanhour
+      - Kafr El Dawwar
+      - Rashid
+      - Edku
+      - Abu Hummus
+      - Itay El Baroud
+      - Kom Hamada
+      - Housh Eissa
+
+  - id: gharbia
+    name_en: Gharbia
+    name_ar: الغربية
+    cities:
+      - Tanta
+      - El Mahalla El Kubra
+      - Kafr El Zayat
+      - Zefta
+      - Samannoud
+      - Basyoun
+      - Santa
+
+  - id: monufia
+    name_en: Monufia
+    name_ar: المنوفية
+    cities:
+      - Shibin El Kom
+      - Menouf
+      - Sadat City
+      - Ashmoun
+      - Quesna
+      - Berket El Sabaa
+      - Tala
+
+  - id: kafr_el_sheikh
+    name_en: Kafr El Sheikh
+    name_ar: كفر الشيخ
+    cities:
+      - Kafr El Sheikh City
+      - Desouk
+      - Fuwwah
+      - Baltim
+      - Metoubes
+      - Sidi Salem
+      - Bila
+
+  - id: damietta
+    name_en: Damietta
+    name_ar: دمياط
+    cities:
+      - Damietta City
+      - New Damietta
+      - Ras El Bar
+      - Faraskur
+      - Kafr Saad
+      - Zarqa
+
+  - id: port_said
+    name_en: Port Said
+    name_ar: بورسعيد
+    cities:
+      - Port Said City
+      - Port Fouad
+      - El Arab District
+      - El Manakh District
+
+  - id: ismailia
+    name_en: Ismailia
+    name_ar: الإسماعيلية
+    cities:
+      - Ismailia City
+      - Fayed
+      - Abu Suwir
+      - Qantara
+      - Tel El Kebir
+
+  - id: suez
+    name_en: Suez
+    name_ar: السويس
+    cities:
+      - Suez City
+      - Ataka
+      - Faisal District
+      - Arbaeen
+      - Ganayen
+
+  - id: north_sinai
+    name_en: North Sinai
+    name_ar: شمال سيناء
+    cities:
+      - Arish
+      - Bir El Abd
+      - Sheikh Zuweid
+      - Rafah
+
+  - id: south_sinai
+    name_en: South Sinai
+    name_ar: جنوب سيناء
+    cities:
+      - Sharm El Sheikh
+      - Dahab
+      - Nuweiba
+      - Saint Catherine
+      - El Tor
+      - Taba
+
+  - id: faiyum
+    name_en: Faiyum
+    name_ar: الفيوم
+    cities:
+      - Faiyum City
+      - Ibsheway
+      - Tamiya
+      - Sinnuris
+      - Etsa
+      - Youssef El Seddik
+
+  - id: beni_suef
+    name_en: Beni Suef
+    name_ar: بني سويف
+    cities:
+      - Beni Suef City
+      - New Beni Suef
+      - Nasser
+      - Wasta
+      - Beba
+      - Ihnasia
+
+  - id: minya
+    name_en: Minya
+    name_ar: المنيا
+    cities:
+      - Minya City
+      - Mallawi
+      - Samalut
+      - Beni Mazar
+      - Maghagha
+      - Abu Qurqas
+      - Deir Mawas
+
+  - id: asyut
+    name_en: Asyut
+    name_ar: أسيوط
+    cities:
+      - Asyut City
+      - Dairut
+      - Manfalut
+      - Abnub
+      - Abu Tig
+      - El Qusiya
+      - Sahel Selim
+
+  - id: sohag
+    name_en: Sohag
+    name_ar: سوهاج
+    cities:
+      - Sohag City
+      - Akhmim
+      - Girga
+      - Tahta
+      - El Balyana
+      - Tema
+      - Maragha
+
+  - id: qena
+    name_en: Qena
+    name_ar: قنا
+    cities:
+      - Qena City
+      - Nag Hammadi
+      - Qus
+      - Dishna
+      - Naqada
+      - Abu Tesht
+
+  - id: luxor
+    name_en: Luxor
+    name_ar: الأقصر
+    cities:
+      - Luxor City
+      - East Bank
+      - West Bank
+      - Karnak
+      - Esna
+      - Armant
+
+  - id: aswan
+    name_en: Aswan
+    name_ar: أسوان
+    cities:
+      - Aswan City
+      - Kom Ombo
+      - Edfu
+      - Daraw
+      - Nasr El Nuba
+      - Abu Simbel
+
+  - id: red_sea
+    name_en: Red Sea
+    name_ar: البحر الأحمر
+    cities:
+      - Hurghada
+      - Safaga
+      - El Gouna
+      - Marsa Alam
+      - Ras Ghareb
+      - Quseer
+
+  - id: new_valley
+    name_en: New Valley
+    name_ar: الوادي الجديد
+    cities:
+      - Kharga
+      - Dakhla
+      - Farafra
+      - Balat
+      - Paris
+
+  - id: matrouh
+    name_en: Matrouh
+    name_ar: مطروح
+    cities:
+      - Marsa Matrouh
+      - El Alamein
+      - Sidi Abdel Rahman
+      - Sallum
+      - Siwa
+      - Dabaa
+
+niche_categories:
+  Food & Beverage:
+    - restaurants
+    - cafes
+    - coffee shops
+    - bakeries
+    - patisseries
+    - fast food
+    - pizza restaurants
+    - seafood restaurants
+    - grill restaurants
+    - koshary shops
+    - juice bars
+    - ice cream shops
+    - dessert shops
+    - food trucks
+    - catering services
+    - butcher shops
+    - fish markets
+    - dairy shops
+    - nuts and dried fruit shops
+    - spice shops
+    - honey shops
+    - bottled water suppliers
+
+  Grocery & Retail:
+    - supermarkets
+    - grocery stores
+    - mini markets
+    - hypermarkets
+    - convenience stores
+    - organic food stores
+    - gift shops
+    - stationery stores
+    - bookstores
+    - toy stores
+    - tobacco shops
+    - perfume shops
+    - accessories shops
+    - watch shops
+    - jewelry stores
+    - gold shops
+    - antique shops
+    - flower shops
+    - pet shops
+
+  Health & Medical:
+    - pharmacies
+    - clinics
+    - medical centers
+    - dentists
+    - dental clinics
+    - dermatology clinics
+    - pediatric clinics
+    - gynecology clinics
+    - orthopedic clinics
+    - eye clinics
+    - ENT clinics
+    - cardiology clinics
+    - psychiatry clinics
+    - physiotherapy centers
+    - radiology centers
+    - medical labs
+    - optical shops
+    - hearing aid centers
+    - veterinary clinics
+    - nutritionists
+    - nursing services
+    - medical equipment suppliers
+    - herbal medicine shops
+
+  Beauty & Personal Care:
+    - beauty salons
+    - hair salons
+    - barbershops
+    - nail salons
+    - spa centers
+    - massage centers
+    - skincare clinics
+    - laser hair removal centers
+    - makeup artists
+    - beauty supply stores
+    - perfume and cosmetics shops
+    - tattoo studios
+    - slimming centers
+
+  Fashion & Apparel:
+    - clothing stores
+    - women clothing stores
+    - men clothing stores
+    - children clothing stores
+    - shoe stores
+    - bags and leather shops
+    - abaya and veil shops
+    - bridal shops
+    - tailors
+    - fabric stores
+    - sportswear shops
+    - lingerie shops
+    - uniforms suppliers
+
+  Automotive:
+    - auto repair shops
+    - car dealerships
+    - used car dealers
+    - car wash
+    - tire shops
+    - auto spare parts
+    - car accessories shops
+    - oil change centers
+    - car electrical services
+    - car painting and bodywork
+    - motorcycle dealers
+    - motorcycle repair
+    - car rental
+    - driving schools
+    - battery shops
+
+  Home & Living:
+    - furniture stores
+    - kitchen suppliers
+    - home appliances stores
+    - lighting stores
+    - curtain shops
+    - carpet stores
+    - home decor shops
+    - mattress stores
+    - kitchenware shops
+    - electronics stores
+    - mobile phone shops
+    - computer stores
+    - hardware stores
+    - paint stores
+    - sanitary ware shops
+    - ceramic and tile shops
+    - glass and aluminum shops
+
+  Construction & Trades:
+    - contractors
+    - construction companies
+    - building materials suppliers
+    - plumbers
+    - electricians
+    - carpenters
+    - painters
+    - blacksmiths
+    - aluminum workshops
+    - marble and granite suppliers
+    - gypsum board contractors
+    - air conditioning services
+    - elevator companies
+    - solar energy companies
+    - insulation services
+    - well drilling services
+
+  Professional Services:
+    - lawyers
+    - law firms
+    - accounting offices
+    - tax consultants
+    - engineering offices
+    - architecture firms
+    - marketing agencies
+    - advertising agencies
+    - printing shops
+    - translation services
+    - business consultants
+    - insurance agencies
+    - real estate agencies
+    - recruitment agencies
+    - security services
+    - cleaning services
+
+  Education & Training:
+    - private schools
+    - language schools
+    - nurseries
+    - kindergartens
+    - training centers
+    - tutoring centers
+    - driving instructors
+    - music schools
+    - art schools
+    - computer training centers
+    - language institutes
+    - quran centers
+    - educational bookstores
+
+  Technology & Communication:
+    - mobile phone repair
+    - computer repair
+    - IT services
+    - software companies
+    - web design companies
+    - CCTV and security systems
+    - satellite and dish services
+    - internet service providers
+    - electronics repair
+    - printing and photocopy services
+
+  Travel & Hospitality:
+    - hotels
+    - hostels
+    - travel agencies
+    - tour operators
+    - car transport services
+    - furnished apartments
+    - resorts
+    - event halls
+    - wedding halls
+    - conference centers
+
+  Sports & Fitness:
+    - gyms
+    - fitness centers
+    - yoga studios
+    - martial arts schools
+    - swimming pools
+    - sports academies
+    - football academies
+    - sporting goods stores
+    - bicycle shops
+
+  Entertainment & Events:
+    - event planners
+    - wedding planners
+    - photographers
+    - photography studios
+    - videographers
+    - DJs and sound services
+    - party supplies shops
+    - kids entertainment centers
+    - gaming centers
+    - cinemas
+
+  Agriculture & Animals:
+    - agricultural supplies
+    - fertilizer shops
+    - seed shops
+    - plant nurseries
+    - poultry farms
+    - livestock traders
+    - veterinary pharmacies
+    - fishing equipment shops
+    - pet grooming
+
+  Industrial & Logistics:
+    - factories
+    - workshops
+    - packaging suppliers
+    - plastic manufacturers
+    - textile factories
+    - food processing companies
+    - shipping companies
+    - freight forwarders
+    - warehouses
+    - moving companies
+    - courier services
+    - import and export companies
+
+  Financial Services:
+    - money transfer offices
+    - currency exchange
+    - microfinance offices
+    - investment offices
+    - real estate investment offices
+
+  Miscellaneous:
+    - laundry and dry cleaning
+    - shoe repair
+    - key and locksmith services
+    - watch repair
+    - mobile accessories
+    - internet cafes
+    - copy centers
+    - recycling centers
+    - waste management services
+    - pest control services
+    - gardening services

@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Egypt Lead Scraper{% endblock %}
+
+{% block subtitle %}Collect Egyptian business leads · export to Excel{% endblock %}
+
+{% block actions %}
+{% if running_batches > 0 %}
+<form method="post" action="/batches/stop-all" style="display:inline">
+  <button class="btn danger" type="submit">Stop all overnight ({{ running_batches }})</button>
+</form>
+{% endif %}
+<a class="btn primary" href="/leads">View leads</a>
+{% endblock %}
+
+{% block content %}
+<section class="hero-actions">
+  <a class="action-tile primary" href="/overnight">
+    <div class="tile-kicker">Recommended</div>
+    <strong>Overnight Mode</strong>
+    <p>Many niches × cities while you sleep. Safe profile by default.</p>
+  </a>
+  <a class="action-tile" href="/campaigns/new">
+    <div class="tile-kicker">Single run</div>
+    <strong>Quick campaign</strong>
+    <p>One niche, one city — good for a short test.</p>
+  </a>
+</section>
+
+<section class="stats">
+  <div class="stat highlight">
+    <span class="label">Saved leads</span>
+    <span class="value">{{ leads_count }}</span>
+  </div>
+  <div class="stat">
+    <span class="label">Brain (never re-scrape)</span>
+    <span class="value">{{ brain_count }}</span>
+  </div>
+</section>
+
+{% if batches %}
+<section class="card">
+  <h2>Recent overnight runs</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Status</th>
+          <th>Leads</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for b in batches %}
+        <tr>
+          <td>{{ b.name }}</td>
+          <td><span class="badge {{ b.status }}">{{ b.status }}</span></td>
+          <td class="mono">{{ b.total_leads }}</td>
+          <td>
+            <a href="/batches/{{ b.id }}">Open</a>
+            {% if b.total_leads > 0 %}
+            · <a href="/batches/{{ b.id }}/export">Excel</a>
+            {% endif %}
+            {% if b.status == 'running' or b.status == 'queued' %}
+            ·
+            <form method="post" action="/batches/{{ b.id }}/stop" style="display:inline">
+              <button class="mini" type="submit" style="color:#b91c1c;border-color:#fecaca;background:#fee2e2">Stop</button>
+            </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+
+{% if campaigns %}
+<section class="card">
+  <h2>Recent campaigns</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Niche</th>
+          <th>Location</th>
+          <th>Status</th>
+          <th>Leads</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in campaigns %}
+        <tr>
+          <td>{{ c.niche }}</td>
+          <td>{{ c.city }}, {{ c.governorate }}</td>
+          <td><span class="badge {{ c.status }}">{{ c.status }}</span></td>
+          <td class="mono">{{ c.progress_with_phone }}</td>
+          <td><a href="/campaigns/{{ c.id }}">Open</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% else %}
+<section class="card">
+  <div class="empty">
+    <strong>Ready when you are</strong>
+    Start Overnight or a quick campaign — then open the <a href="/leads">Leads</a> tab.
+  </div>
+</section>
+{% endif %}
+{% endblock %}

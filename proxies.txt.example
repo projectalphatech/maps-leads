@@ -1,0 +1,15 @@
+# Proxy list — one proxy per line (this file is gitignored when you add real credentials)
+#
+# Supported formats:
+#   http://username:password@host:port
+#   socks5://username:password@host:port
+#   host:port:username:password
+#   host:port
+#
+# Residential proxies work best for Google Maps (recommended providers:
+# Bright Data, Oxylabs, Smartproxy, IPRoyal, Webshare)
+#
+# Example (replace with your real proxies):
+# http://user:pass@gate.provider.com:10001
+# http://user:pass@gate.provider.com:10002
+# 192.168.1.100:8080:myuser:mypass

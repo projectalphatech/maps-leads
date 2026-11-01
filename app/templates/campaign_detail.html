@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Campaign #{{ campaign.id }}{% endblock %}
+
+{% block header_title %}
+<h1 class="page-title">{{ campaign.niche }}</h1>
+<p class="subtitle">{{ campaign.city }}, {{ campaign.governorate }}</p>
+{% endblock %}
+
+{% block actions %}
+{% if is_running %}
+<form method="post" action="/campaigns/{{ campaign.id }}/stop">
+  <button class="btn danger" type="submit">Stop</button>
+</form>
+{% endif %}
+{% if campaign.progress_with_phone > 0 %}
+<a class="btn primary" href="/campaigns/{{ campaign.id }}/export">Download Excel</a>
+{% endif %}
+<a class="btn" href="/leads">All leads</a>
+{% endblock %}
+
+{% block content %}
+<section class="stats">
+  <div class="stat highlight">
+    <span class="label">Leads saved</span>
+    <span class="value">{{ campaign.progress_with_phone }}</span>
+  </div>
+  <div class="stat">
+    <span class="label">Status</span>
+    <span class="value sm"><span class="badge {{ campaign.status }}">{{ campaign.status }}</span></span>
+  </div>
+</section>
+
+{% if campaign.error_message %}
+<section class="card error"><strong>Error:</strong> {{ campaign.error_message }}</section>
+{% endif %}
+
+{% if is_running %}
+<section class="card live info">Collecting leads in the background…</section>
+{% elif campaign.status == 'completed' %}
+<section class="card info">Done. Download Excel or open the <a href="/leads">Leads</a> tab.</section>
+{% endif %}
+
+<section class="card">
+  <h2>Leads</h2>
+  {% if leads %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Phone</th>
+          <th>Business</th>
+          <th>Address</th>
+          <th>Facebook</th>
+          <th>Instagram</th>
+          <th>Maps</th>
+        </tr>
+      </thead>
+      <tbody id="live-leads-body">
+        {% for lead in leads %}
+        <tr>
+          <td class="phone">{{ lead.phone_display or lead.phone }}</td>
+          <td>{{ lead.business_name }}</td>
+          <td>{{ lead.address or '—' }}</td>
+          <td>{% if lead.facebook_url %}<a href="{{ lead.facebook_url }}" target="_blank" rel="noopener">Open</a>{% else %}—{% endif %}</td>
+          <td>{% if lead.instagram_handle %}{{ lead.instagram_handle }}{% else %}—{% endif %}</td>
+          <td>{% if lead.maps_url %}<a href="{{ lead.maps_url }}" target="_blank" rel="noopener">Maps</a>{% else %}—{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty"><strong>No leads yet</strong>They appear here as phones are found.</div>
+  {% endif %}
+</section>
+{% endblock %}
+
+{% block scripts %}
+{% if is_running %}
+<script>
+  async function pollCampaign() {
+    try {
+      const data = await window.appDebug.fetchJson(
+        '/api/campaigns/{{ campaign.id }}/status',
+        {},
+        'campaign_detail.pollCampaign'
+      );
+      document.querySelector('.stat.highlight .value').textContent = data.leads_saved;
+      if (!data.is_running) { location.reload(); return; }
+    } catch(e) {
+      window.appDebug.logError('campaign_detail.pollCampaign.catch', e, { campaignId: {{ campaign.id }} });
+    }
+    setTimeout(pollCampaign, 5000);
+  }
+  setTimeout(pollCampaign, 5000);
+</script>
+{% endif %}
+{% endblock %}

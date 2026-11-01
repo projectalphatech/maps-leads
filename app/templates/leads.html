@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Leads{% endblock %}
+
+{% block header_title %}
+<h1 class="page-title">Leads</h1>
+<p class="subtitle">Phone · business · address · social · Maps</p>
+{% endblock %}
+
+{% block actions %}
+{% if leads %}
+<a class="btn primary" href="/leads/export">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+  Download Excel
+</a>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+<form class="card form" method="get" action="/leads" style="margin-bottom:1rem">
+  <label style="margin-bottom:0">
+    Search
+    <div style="display:flex;gap:0.5rem;margin-top:0.4rem">
+      <input type="search" name="q" value="{{ q }}" placeholder="Name, phone, city, address…" style="margin-top:0" />
+      <button class="btn" type="submit">Search</button>
+    </div>
+  </label>
+  <p class="muted" style="margin:0.65rem 0 0;font-size:0.85rem">Showing {{ total_shown }} lead{% if total_shown != 1 %}s{% endif %} (latest 500)</p>
+</form>
+
+<section class="card">
+  {% if leads %}
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Phone</th>
+          <th>Business</th>
+          <th>Address</th>
+          <th>Facebook</th>
+          <th>Instagram</th>
+          <th>Maps</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for lead in leads %}
+        <tr>
+          <td class="phone">{{ lead.phone_display or lead.phone }}</td>
+          <td>{{ lead.business_name }}</td>
+          <td>{{ lead.address or '—' }}</td>
+          <td>{% if lead.facebook_url %}<a href="{{ lead.facebook_url }}" target="_blank" rel="noopener">Open</a>{% else %}—{% endif %}</td>
+          <td>{% if lead.instagram_handle %}{{ lead.instagram_handle }}{% else %}—{% endif %}</td>
+          <td>{% if lead.maps_url %}<a href="{{ lead.maps_url }}" target="_blank" rel="noopener">Maps</a>{% else %}—{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+  <div class="empty">
+    <strong>No leads yet</strong>
+    Start Overnight or a quick run — results show up here.
+  </div>
+  {% endif %}
+</section>
+{% endblock %}

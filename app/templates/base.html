@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Egypt Lead Scraper{% endblock %}</title>
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg" />
+  <link rel="stylesheet" href="/static/style.css" />
+  {% block head %}{% endblock %}
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <a href="/" class="brand-mark" aria-hidden="true" style="text-decoration:none;color:#fff">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+            <circle cx="12" cy="10" r="3"/>
+          </svg>
+        </a>
+        <div class="brand-text">
+          {% block header_title %}
+          <h1 class="page-title"><a href="/" style="color:inherit;text-decoration:none">Egypt Lead Scraper</a></h1>
+          <p class="subtitle">{% block subtitle %}Your leads · local app{% endblock %}</p>
+          {% endblock %}
+        </div>
+      </div>
+      <nav class="app-nav" aria-label="Main">
+        <a class="nav-link {% if active_nav == 'home' %}active{% endif %}" href="/">Home</a>
+        <a class="nav-link {% if active_nav == 'leads' %}active{% endif %}" href="/leads">Leads</a>
+        <a class="nav-link {% if active_nav == 'logs' %}active{% endif %}" href="/logs">Activity</a>
+        <a class="nav-link {% if active_nav == 'overnight' %}active{% endif %}" href="/overnight">Overnight</a>
+        <a class="nav-link {% if active_nav == 'new' %}active{% endif %}" href="/campaigns/new">Quick run</a>
+      </nav>
+      <div class="nav-actions">
+        {% block actions %}{% endblock %}
+      </div>
+    </header>
+
+    <main class="container {% block container_class %}{% endblock %}">
+      {% block content %}{% endblock %}
+    </main>
+
+    <p class="footer-note">Local app · runs in the background on this PC</p>
+  </div>
+  <script>
+    // Global browser-side diagnostics for F12 debugging.
+    window.appDebug = {
+      logError(context, error, extra = {}) {
+        const payload = { context, extra, timestamp: new Date().toISOString() };
+        if (error && typeof error === 'object') {
+          payload.name = error.name || 'Error';
+          payload.message = error.message || String(error);
+          payload.stack = error.stack || null;
+        } else {
+          payload.message = String(error);
+        }
+        console.error('[EgyptLeads]', payload);
+      },
+      async fetchJson(url, options = {}, context = 'fetchJson') {
+        const res = await fetch(url, options);
+        if (!res.ok) {
+          let body = '';
+          try {
+            body = await res.text();
+          } catch (_err) {
+            body = '<failed to read response body>';
+          }
+          const err = new Error(`HTTP ${res.status} ${res.statusText}`);
+          this.logError(context, err, { url, status: res.status, body });
+          throw err;
+        }
+        return res.json();
+      }
+    };
+
+    window.addEventListener('error', (event) => {
+      window.appDebug.logError('window.error', event.error || event.message, {
+        file: event.filename,
+        line: event.lineno,
+        column: event.colno
+      });
+    });
+
+    window.addEventListener('unhandledrejection', (event) => {
+      window.appDebug.logError('window.unhandledrejection', event.reason);
+    });
+  </script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

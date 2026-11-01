@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+
+{% block title %}Overnight Mode{% endblock %}
+
+{% block header_title %}
+<h1 class="page-title">Overnight Mode</h1>
+<p class="subtitle">Many niches across Egypt · unattended with rest breaks</p>
+{% endblock %}
+
+{% block actions %}
+<form method="post" action="/batches/stop-all" style="display:inline">
+  <button class="btn danger" type="submit">Stop all running</button>
+</form>
+<a class="btn" href="/leads">Leads</a>
+{% endblock %}
+
+{% block content %}
+<section class="card live" style="padding-bottom:0.5rem;margin-bottom:1rem">
+  <h2>Live activity</h2>
+  <p class="muted" style="margin-top:-0.5rem">Shows what the bot is doing after you start a run. Open a batch page for the same feed while it works.</p>
+  <div class="log-toolbar">
+    <span class="muted" id="log-status">Live</span>
+    <label class="inline" style="margin:0">
+      <input type="checkbox" id="auto-scroll" checked />
+      Auto-scroll
+    </label>
+  </div>
+  <div class="log-feed" id="log-feed" aria-live="polite">
+    <div class="log-empty muted">No activity yet. Start a batch below.</div>
+  </div>
+</section>
+
+<form class="card form" method="post" action="/overnight">
+  <label>
+    Batch name
+    <input type="text" name="name" placeholder="e.g. Cairo + Giza restaurants overnight" />
+  </label>
+
+  <fieldset class="group">
+    <legend>Scrape profile</legend>
+    <div class="profile-pick">
+      <label class="profile-option">
+        <input type="radio" name="scrape_profile" value="safe" {% if default_profile != 'turbo' %}checked{% endif %} />
+        <strong>Overnight Steady (recommended)</strong>
+        <span class="muted">3 workers · 0.9–2.2s pauses · 6–15s rest · social off · best balance of speed and reliability</span>
+      </label>
+      <label class="profile-option">
+        <input type="radio" name="scrape_profile" value="turbo" {% if default_profile == 'turbo' %}checked{% endif %} />
+        <strong>Turbo</strong>
+        <span class="muted">4 workers · short pauses · faster, higher captcha risk</span>
+      </label>
+    </div>
+    {% if not proxy_status.enabled %}
+    <div class="card info" style="margin-top:0.85rem;margin-bottom:0;box-shadow:none">
+      <strong>Tip:</strong> Proxies are off. For best overnight results set
+      <code>PROXY_ENABLED=true</code> and add residential proxies to <code>proxies.txt</code>.
+    </div>
+    {% else %}
+    <div class="card info" style="margin-top:0.85rem;margin-bottom:0;box-shadow:none">
+      Proxies on: {{ proxy_status.active }}/{{ proxy_status.total }} active.
+    </div>
+    {% endif %}
+  </fieldset>
+
+  <fieldset class="group">
+    <legend>Governorates</legend>
+    <label class="inline">
+      <input type="checkbox" name="governorates" value="__all__" checked onchange="toggleAll(this, 'gov')" />
+      <strong>All governorates</strong>
+    </label>
+    <div class="checkgrid">
+      {% for gov in governorates %}
+      <label class="inline">
+        <input type="checkbox" class="gov" name="governorates" value="{{ gov.id }}" />
+        {{ gov.name_en }}
+      </label>
+      {% endfor %}
+    </div>
+  </fieldset>
+
+  <fieldset class="group">
+    <legend>Niches ({{ total_niches }} available)</legend>
+    <input
+      type="search"
+      class="filter-input"
+      id="niche-filter"
+      placeholder="Filter niches…"
+      autocomplete="off"
+    />
+    <label class="inline">
+      <input type="checkbox" name="niches" value="__all__" checked onchange="toggleAll(this, 'niche')" />
+      <strong>All niches</strong>
+    </label>
+    {% for category, niches in niche_categories.items() %}
+    <div class="niche-cat" data-category="{{ category|lower }}">
+      <div class="cat-head">
+        <span>{{ category }}</span>
+        <button type="button" class="mini" onclick="toggleCat(this)">toggle</button>
+      </div>
+      <div class="checkgrid">
+        {% for niche in niches %}
+        <label class="inline niche-item" data-label="{{ niche|lower }}">
+          <input type="checkbox" class="niche" name="niches" value="{{ niche }}" />
+          {{ niche }}
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+    {% endfor %}
+  </fieldset>
+
+  <div class="card info" style="box-shadow:none">
+    <strong>How it works:</strong> each job scrolls until Maps has no more results for that
+    niche + city. Jobs run one at a time. The brain skips businesses already found.
+    Leave the app running overnight — you can stop anytime.
+  </div>
+
+  <button class="btn primary" type="submit">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+    Start overnight batch
+  </button>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function toggleAll(master, cls) {
+    document.querySelectorAll('.' + cls).forEach((cb) => { cb.checked = false; });
+  }
+  function toggleCat(btn) {
+    const grid = btn.closest('.niche-cat').querySelector('.checkgrid');
+    const boxes = grid.querySelectorAll('input[type=checkbox]');
+    const anyUnchecked = Array.from(boxes).some((b) => !b.checked);
+    boxes.forEach((b) => { b.checked = anyUnchecked; });
+    const allNiche = document.querySelector('input[name=niches][value="__all__"]');
+    if (allNiche) allNiche.checked = false;
+  }
+  document.querySelectorAll('.niche, .gov').forEach((cb) => {
+    cb.addEventListener('change', () => {
+      if (cb.checked) {
+        const master = document.querySelector(
+          `input[name=${cb.classList.contains('gov') ? 'governorates' : 'niches'}][value="__all__"]`
+        );
+        if (master) master.checked = false;
+      }
+    });
+  });
+  const filter = document.getElementById('niche-filter');
+  if (filter) {
+    filter.addEventListener('input', () => {
+      const q = filter.value.trim().toLowerCase();
+      document.querySelectorAll('.niche-cat').forEach((cat) => {
+        let visible = 0;
+        cat.querySelectorAll('.niche-item').forEach((item) => {
+          const show = !q || item.dataset.label.includes(q) || cat.dataset.category.includes(q);
+          item.style.display = show ? '' : 'none';
+          if (show) visible += 1;
+        });
+        cat.classList.toggle('hidden', visible === 0);
+      });
+    });
+  }
+
+  const feed = document.getElementById('log-feed');
+  const statusEl = document.getElementById('log-status');
+  const autoScroll = document.getElementById('auto-scroll');
+  let lastId = 0;
+  function fmtTime(ts) {
+    return new Date(ts * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+  function escapeHtml(s) {
+    return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  async function pollLogs() {
+    if (!feed) return;
+    try {
+      const data = await window.appDebug.fetchJson(
+        '/api/activity?after_id=' + lastId + '&limit=80',
+        {},
+        'overnight.pollLogs'
+      );
+      const events = data.events || [];
+      if (events.length) {
+        const empty = feed.querySelector('.log-empty');
+        if (empty) empty.remove();
+        for (const e of events) {
+          lastId = Math.max(lastId, e.id);
+          const row = document.createElement('div');
+          row.className = 'log-row level-' + (e.level || 'info');
+          row.innerHTML = `<span class="log-time">${fmtTime(e.ts)}</span><span class="log-msg">${escapeHtml(e.message)}</span>`;
+          feed.appendChild(row);
+        }
+        while (feed.children.length > 200) feed.removeChild(feed.firstChild);
+        if (autoScroll && autoScroll.checked) feed.scrollTop = feed.scrollHeight;
+      }
+      if (statusEl) statusEl.textContent = 'Live';
+    } catch (e) {
+      window.appDebug.logError('overnight.pollLogs.catch', e, { lastId });
+      if (statusEl) statusEl.textContent = 'Reconnect…';
+    }
+    setTimeout(pollLogs, 2000);
+  }
+  pollLogs();
+</script>
+{% endblock %}

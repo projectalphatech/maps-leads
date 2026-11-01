@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Activity{% endblock %}
+
+{% block header_title %}
+<h1 class="page-title">Activity</h1>
+<p class="subtitle">Live feed of what the bot is doing right now</p>
+{% endblock %}
+
+{% block actions %}
+<button class="btn" type="button" id="clear-logs">Clear</button>
+{% endblock %}
+
+{% block content %}
+<section class="card live" style="padding-bottom:0.5rem">
+  <div class="log-toolbar">
+    <span class="muted" id="log-status">Connecting…</span>
+    <label class="inline" style="margin:0">
+      <input type="checkbox" id="auto-scroll" checked />
+      Auto-scroll
+    </label>
+  </div>
+  <div class="log-feed" id="log-feed" aria-live="polite">
+    <div class="log-empty muted">Waiting for activity… Start Overnight or a quick run.</div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const feed = document.getElementById('log-feed');
+  const statusEl = document.getElementById('log-status');
+  const autoScroll = document.getElementById('auto-scroll');
+  let lastId = 0;
+
+  function fmtTime(ts) {
+    const d = new Date(ts * 1000);
+    return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  }
+
+  function addEvents(events) {
+    if (!events.length) return;
+    const empty = feed.querySelector('.log-empty');
+    if (empty) empty.remove();
+
+    for (const e of events) {
+      lastId = Math.max(lastId, e.id);
+      const row = document.createElement('div');
+      row.className = 'log-row level-' + (e.level || 'info');
+      row.innerHTML =
+        `<span class="log-time">${fmtTime(e.ts)}</span>` +
+        `<span class="log-msg">${escapeHtml(e.message)}</span>`;
+      feed.appendChild(row);
+    }
+    while (feed.children.length > 250) feed.removeChild(feed.firstChild);
+    if (autoScroll.checked) feed.scrollTop = feed.scrollHeight;
+  }
+
+  function escapeHtml(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  async function poll() {
+    try {
+      const data = await window.appDebug.fetchJson(
+        '/api/activity?after_id=' + lastId + '&limit=80',
+        {},
+        'logs.poll'
+      );
+      addEvents(data.events || []);
+      statusEl.textContent = 'Live · updates every 2s';
+    } catch (err) {
+      window.appDebug.logError('logs.poll.catch', err, { lastId });
+      statusEl.textContent = 'Reconnect…';
+    }
+    setTimeout(poll, 2000);
+  }
+
+  document.getElementById('clear-logs').addEventListener('click', async () => {
+    try {
+      await window.appDebug.fetchJson('/api/activity/clear', { method: 'POST' }, 'logs.clear');
+      feed.innerHTML = '<div class="log-empty muted">Cleared. Waiting for activity…</div>';
+      lastId = 0;
+    } catch (err) {
+      window.appDebug.logError('logs.clear.catch', err);
+    }
+  });
+
+  poll();
+</script>
+{% endblock %}

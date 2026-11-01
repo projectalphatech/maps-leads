@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}New Campaign{% endblock %}
+
+{% block header_title %}
+<h1 class="page-title">Quick campaign</h1>
+<p class="subtitle">One niche · one location in Egypt</p>
+{% endblock %}
+
+{% block actions %}{% endblock %}
+
+{% block container_class %}narrow{% endblock %}
+
+{% block content %}
+<form class="card form" method="post" action="/campaigns">
+  <label>
+    Niche / business type
+    <input type="text" name="niche" list="niche-presets" placeholder="e.g. restaurants, dentists, pharmacies" required />
+    <datalist id="niche-presets">
+      {% for niche in niche_presets %}
+      <option value="{{ niche }}"></option>
+      {% endfor %}
+    </datalist>
+  </label>
+
+  <label>
+    Governorate
+    <select id="governorate" name="governorate_id" required>
+      <option value="">Select governorate</option>
+      {% for gov in governorates %}
+      <option value="{{ gov.id }}" data-name="{{ gov.name_en }}">{{ gov.name_en }} — {{ gov.name_ar }}</option>
+      {% endfor %}
+    </select>
+    <input type="hidden" id="governorate_name" name="governorate_name" />
+  </label>
+
+  <label>
+    City / area
+    <select id="city" name="city" required disabled>
+      <option value="">Select governorate first</option>
+    </select>
+  </label>
+
+  <label>
+    Max results to scan
+    <select name="max_results">
+      <option value="25">25</option>
+      <option value="50" selected>50</option>
+      <option value="100">100</option>
+      <option value="150">150</option>
+      <option value="200">200</option>
+    </select>
+  </label>
+
+  <button class="btn primary" type="submit">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+    Start scraping
+  </button>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const governorateSelect = document.getElementById('governorate');
+  const governorateNameInput = document.getElementById('governorate_name');
+  const citySelect = document.getElementById('city');
+
+  governorateSelect.addEventListener('change', async () => {
+    const option = governorateSelect.selectedOptions[0];
+    const govId = governorateSelect.value;
+    governorateNameInput.value = option?.dataset?.name || '';
+
+    citySelect.innerHTML = '<option value="">Loading...</option>';
+    citySelect.disabled = true;
+
+    if (!govId) {
+      citySelect.innerHTML = '<option value="">Select governorate first</option>';
+      return;
+    }
+
+    try {
+      const data = await window.appDebug.fetchJson(
+        `/api/cities/${govId}`,
+        {},
+        'new_campaign.loadCities'
+      );
+      citySelect.innerHTML = '<option value="">Select city</option>';
+      data.cities.forEach((city) => {
+        const opt = document.createElement('option');
+        opt.value = city;
+        opt.textContent = city;
+        citySelect.appendChild(opt);
+      });
+      citySelect.disabled = false;
+    } catch (e) {
+      window.appDebug.logError('new_campaign.loadCities.catch', e, { governorateId: govId });
+      citySelect.innerHTML = '<option value="">Failed to load cities</option>';
+    }
+  });
+</script>
+{% endblock %}
